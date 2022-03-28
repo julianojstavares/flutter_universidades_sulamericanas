@@ -1,8 +1,11 @@
 import 'package:flutter/material.dart';
-import 'package:uni_sulamerica/providers/university_api_provider.dart';
+import 'package:uni_sulamerica/controllers/lista_universidades_controller.dart';
+import 'package:uni_sulamerica/models/universidade.dart';
 
 class ListaUniversidadesPage extends StatefulWidget {
-  const ListaUniversidadesPage({Key? key}) : super(key: key);
+  const ListaUniversidadesPage({
+    Key? key,
+  }) : super(key: key);
 
   @override
   State<ListaUniversidadesPage> createState() => _ListaUniversidadesPageState();
@@ -10,10 +13,77 @@ class ListaUniversidadesPage extends StatefulWidget {
 
 class _ListaUniversidadesPageState extends State<ListaUniversidadesPage> {
   final TextEditingController _searchQuery = TextEditingController();
+  final controller = ListaUniversidadesController();
 
   @override
   void initState() {
     super.initState();
+    Future.delayed(Duration.zero, () {
+      setState(() {
+        final routeData = ModalRoute.of(context)?.settings.arguments as String;
+        controller.start(routeData);
+      });
+    });
+  }
+
+  _success() {
+    return ListView.builder(
+      itemCount: controller.universidades.length,
+      itemBuilder: (context, index) {
+        UniversidadeModel universidade = controller.universidades[index];
+        return Padding(
+          padding: const EdgeInsets.all(8.0),
+          child: OutlinedButton(
+            onPressed: () => Navigator.pushNamed(
+              context,
+              '/detalhes_universidade',
+              arguments: AtributosUniversidade(universidade.country,
+                  universidade.name, universidade.webPages),
+            ),
+            child: ListTile(
+              title: Text(universidade.name ?? "Sem nome"),
+              trailing: IconButton(
+                icon: const Icon(Icons.favorite_border),
+                onPressed: () {},
+              ),
+            ),
+          ),
+        );
+      },
+    );
+  }
+
+  _error() {
+    return const Center(
+      child: Text('Erro ao carregar lista de universidades'),
+    );
+  }
+
+  _loading() {
+    return const Center(
+      child: CircularProgressIndicator(),
+    );
+  }
+
+  _start() {
+    return const Center(
+      child: Text('Inicie a busca'),
+    );
+  }
+
+  stateManager(ListaUniversidadesState state) {
+    switch (state) {
+      case ListaUniversidadesState.start:
+        return _start();
+      case ListaUniversidadesState.loading:
+        return _loading();
+      case ListaUniversidadesState.success:
+        return _success();
+      case ListaUniversidadesState.error:
+        return _error();
+      default:
+        return _start();
+    }
   }
 
   @override
@@ -29,28 +99,11 @@ class _ListaUniversidadesPageState extends State<ListaUniversidadesPage> {
         body: Column(
           children: [
             Expanded(
-              child: ListView(
-                children: [
-                  TextButton(
-                    style: ButtonStyle(
-                      foregroundColor:
-                          MaterialStateProperty.all<Color>(Colors.blue),
-                    ),
-                    onPressed: () {},
-                    child: OutlinedButton(
-                      onPressed: () => Navigator.pushNamed(
-                          context, '/detalhes_universidade'),
-                      child: ListTile(
-                        leading: const Icon(Icons.school),
-                        title: const Text('Universidade 1'),
-                        trailing: IconButton(
-                          icon: const Icon(Icons.favorite_border),
-                          onPressed: () {},
-                        ),
-                      ),
-                    ),
-                  ),
-                ],
+              child: AnimatedBuilder(
+                animation: controller.state,
+                builder: (context, child) {
+                  return stateManager(controller.state.value);
+                },
               ),
             ),
             Padding(
@@ -76,4 +129,12 @@ class _ListaUniversidadesPageState extends State<ListaUniversidadesPage> {
       ),
     );
   }
+}
+
+class AtributosUniversidade {
+  final String? pais;
+  final String? nome;
+  final List<String>? sites;
+
+  AtributosUniversidade(this.pais, this.nome, this.sites);
 }

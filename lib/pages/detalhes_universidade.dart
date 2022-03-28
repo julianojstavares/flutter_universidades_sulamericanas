@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:uni_sulamerica/pages/lista_universidades.dart';
 import 'package:url_launcher/url_launcher.dart';
 
 class DetalhesUniversidadesPage extends StatelessWidget {
@@ -6,7 +7,8 @@ class DetalhesUniversidadesPage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-
+    final routeData =
+        ModalRoute.of(context)?.settings.arguments as AtributosUniversidade;
     const url = 'http://www.uvs.edu/';
 
     return SafeArea(
@@ -23,20 +25,9 @@ class DetalhesUniversidadesPage extends StatelessWidget {
               child: Padding(
                 padding: const EdgeInsets.all(8.0),
                 child: Row(
-                  children: const [
-                    Text('País: '),
-                    Text('Suriname'),
-                  ],
-                ),
-              ),
-            ),
-            Card(
-              child: Padding(
-                padding: const EdgeInsets.all(8.0),
-                child: Row(
-                  children: const [
-                    Text('Nome: '),
-                    Text('Anton de Kom University'),
+                  children: [
+                    const Text('País: '),
+                    Text(routeData.pais ?? 'Não informado'),
                   ],
                 ),
               ),
@@ -46,20 +37,42 @@ class DetalhesUniversidadesPage extends StatelessWidget {
                 padding: const EdgeInsets.all(8.0),
                 child: Row(
                   children: [
-                    const Text('Site: '),
-                    TextButton(
-                      style: TextButton.styleFrom(
-                        minimumSize: Size.zero,
-                        padding: EdgeInsets.zero,
-                        tapTargetSize: MaterialTapTargetSize.shrinkWrap,
-                      ),
-                      onPressed: () async => openBrowserURL(url: url, inApp: true),
-                      child: const Text(url),
+                    const Text('Nome: '),
+                    Flexible(
+                      child: Text(routeData.nome ?? 'Não informado'),
                     ),
                   ],
                 ),
               ),
             ),
+            Expanded(
+              child: ListView.builder(
+                itemCount: routeData.sites?.length,
+                itemBuilder: (context, index) {
+                  final site = routeData.sites?[index];
+                  return Card(
+                    child: Padding(
+                      padding: const EdgeInsets.all(8.0),
+                      child: Row(
+                        children: [
+                          const Text('Site: '),
+                          TextButton(
+                            style: TextButton.styleFrom(
+                              minimumSize: Size.zero,
+                              padding: EdgeInsets.zero,
+                              tapTargetSize: MaterialTapTargetSize.shrinkWrap,
+                            ),
+                            onPressed: () async => openBrowserURL(
+                                url: site ?? 'não informado', inApp: true),
+                            child: Text(site ?? 'não informado'),
+                          ),
+                        ],
+                      ),
+                    ),
+                  );
+                },
+              ),
+            )
           ],
         ),
         floatingActionButton: FloatingActionButton(
@@ -68,9 +81,8 @@ class DetalhesUniversidadesPage extends StatelessWidget {
         ),
       ),
     );
-
   }
-  
+
   Future openBrowserURL({
     required String url,
     bool inApp = false,
@@ -84,5 +96,4 @@ class DetalhesUniversidadesPage extends StatelessWidget {
       );
     }
   }
-
 }

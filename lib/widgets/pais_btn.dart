@@ -4,12 +4,14 @@ class PaisBtn extends StatelessWidget {
   final String nome;
   final String bandeiraUrl;
   final int nUniversidades;
+  final String country;
 
   const PaisBtn({
     Key? key,
     required this.nome, // non-nullable and required
     this.bandeiraUrl = "", // non-nullable but optional with a default value
-    this.nUniversidades = 0, // non-nullable but optional with a default value
+    this.nUniversidades = 0,
+    required this.country // non-nullable but optional with a default value
   }) : super(key: key);
 
   @override
@@ -44,7 +46,8 @@ class PaisBtn extends StatelessWidget {
             ],
           ),
         ),
-        onPressed: () => Navigator.pushNamed(context, '/lista_universidades'),
+        onPressed: () => Navigator.pushNamed(context, '/lista_universidades',
+            arguments: country),
       ),
     );
   }
