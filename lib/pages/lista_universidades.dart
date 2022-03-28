@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:uni_sulamerica/providers/university_api_provider.dart';
 
 class ListaUniversidadesPage extends StatefulWidget {
   const ListaUniversidadesPage({Key? key}) : super(key: key);
@@ -9,6 +10,11 @@ class ListaUniversidadesPage extends StatefulWidget {
 
 class _ListaUniversidadesPageState extends State<ListaUniversidadesPage> {
   final TextEditingController _searchQuery = TextEditingController();
+
+  @override
+  void initState() {
+    super.initState();
+  }
 
   @override
   Widget build(BuildContext context) {
